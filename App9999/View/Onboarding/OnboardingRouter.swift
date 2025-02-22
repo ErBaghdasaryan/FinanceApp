@@ -11,9 +11,9 @@ import App9999ViewModel
 
 final class OnboardingRouter: BaseRouter {
     static func showBalanceController(in navigationController: UINavigationController) {
-//        let viewController = ViewControllerFactory.makeHomeViewController()
-//        viewController.navigationItem.hidesBackButton = true
-//        navigationController.navigationBar.isHidden = false
-//        navigationController.pushViewController(viewController, animated: true)
+        let viewController = ViewControllerFactory.makeBalanceViewController()
+        viewController.navigationItem.hidesBackButton = true
+        navigationController.navigationBar.isHidden = true
+        navigationController.pushViewController(viewController, animated: true)
     }
 }

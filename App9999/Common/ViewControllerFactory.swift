@@ -20,4 +20,12 @@ final class ViewControllerFactory {
         viewController.viewModel = assembler.resolver.resolve(IOnboardingViewModel.self)
         return viewController
     }
+
+    //MARK: Balance
+    static func makeBalanceViewController() -> BalanceViewController {
+        let assembler = Assembler(commonAssemblies + [BalanceAssembly()])
+        let viewController = BalanceViewController()
+        viewController.viewModel = assembler.resolver.resolve(IBalanceViewModel.self)
+        return viewController
+    }
 }
