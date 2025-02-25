@@ -9,14 +9,25 @@ import Foundation
 import App9999Model
 
 public protocol IBalanceViewModel {
-
+    var balance: String { get set }
 }
 
 public class BalanceViewModel: IBalanceViewModel {
 
     private let balanceService: IBalanceService
+    public var appStorageService: IAppStorageService
 
-    public init(balanceService: IBalanceService) {
+    public var balance: String {
+        get {
+            return appStorageService.getData(key: .balanceCount) ?? ""
+        }
+        set {
+            appStorageService.saveData(key: .balanceCount, value: newValue)
+        }
+    }
+
+    public init(balanceService: IBalanceService, appStorageService: IAppStorageService) {
         self.balanceService = balanceService
+        self.appStorageService = appStorageService
     }
 }

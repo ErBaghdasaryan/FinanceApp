@@ -11,9 +11,7 @@ import App9999ViewModel
 
 final class BalanceRouter: BaseRouter {
     static func showTabBarController(in navigationController: UINavigationController) {
-//        let viewController = ViewControllerFactory.makeBalanceViewController()
-//        viewController.navigationItem.hidesBackButton = true
-//        navigationController.navigationBar.isHidden = true
-//        navigationController.pushViewController(viewController, animated: true)
+        let viewController = ViewControllerFactory.makeTabBarViewController()
+        navigationController.setViewControllers([viewController], animated: true)
     }
 }

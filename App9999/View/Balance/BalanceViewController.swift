@@ -115,8 +115,9 @@ extension BalanceViewController {
             return
         } else {
             guard let navigationController = self.navigationController else { return }
-            
+
             self.errorLabel.isHidden = true
+            self.viewModel?.balance = balance
             BalanceRouter.showTabBarController(in: navigationController)
         }
     }
