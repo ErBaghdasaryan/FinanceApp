@@ -9,14 +9,22 @@ import Foundation
 import App9999Model
 
 public protocol IHomeViewModel {
-
+    var balance: String { get }
 }
 
 public class HomeViewModel: IHomeViewModel {
 
     private let homeService: IHomeService
+    public var appStorageService: IAppStorageService
 
-    public init(homeService: IHomeService) {
+    public var balance: String {
+        get {
+            return appStorageService.getData(key: .balanceCount) ?? ""
+        }
+    }
+
+    public init(homeService: IHomeService, appStorageService: IAppStorageService) {
         self.homeService = homeService
+        self.appStorageService = appStorageService
     }
 }

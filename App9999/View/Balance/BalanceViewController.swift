@@ -118,7 +118,14 @@ extension BalanceViewController {
 
             self.errorLabel.isHidden = true
             self.viewModel?.balance = balance
-            BalanceRouter.showTabBarController(in: navigationController)
+            let viewControllers = navigationController.viewControllers
+
+            if let homeVC = viewControllers.first(where: { $0 is HomeViewController }) {
+                HomeRouter.popViewController(in: navigationController)
+            } else {
+                BalanceRouter.showTabBarController(in: navigationController)
+            }
+            
         }
     }
 }

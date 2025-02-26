@@ -43,6 +43,14 @@ final class ViewControllerFactory {
         return viewController
     }
 
+    //MARK: Collect
+    static func makeCollectViewController() -> CollectViewController {
+        let assembler = Assembler(commonAssemblies + [CollectAssembly()])
+        let viewController = CollectViewController()
+        viewController.viewModel = assembler.resolver.resolve(ICollectViewModel.self)
+        return viewController
+    }
+
     //MARK: Profit
     static func makeProfitViewController() -> ProfitViewController {
         let assembler = Assembler(commonAssemblies + [ProfitAssembly()])

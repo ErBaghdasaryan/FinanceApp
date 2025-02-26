@@ -94,6 +94,7 @@ class BankViewController: BaseViewController {
         self.view.addSubview(randomize)
         self.view.addSubview(replenishmentStack)
         setupConstraints()
+        setupViewTapHandling()
     }
 
     override func setupViewModel() {
@@ -179,6 +180,20 @@ extension BankViewController {
 
 extension BankViewController: IViewModelableController {
     typealias ViewModel = IBankViewModel
+}
+
+//MARK: UIGesture & cell's touches
+extension BankViewController: UITextFieldDelegate, UITextViewDelegate {
+
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+
+    private func setupViewTapHandling() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
 }
 
 //MARK: Preview

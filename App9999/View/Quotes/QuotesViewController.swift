@@ -76,12 +76,12 @@ class QuotesViewController: BaseViewController, UICollectionViewDelegate {
                                         spacing: 16)
 
         let mylayout = UICollectionViewFlowLayout()
-        mylayout.scrollDirection = .horizontal
+        mylayout.scrollDirection = .vertical
         mylayout.minimumLineSpacing = 16
         mylayout.minimumInteritemSpacing = 16
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: mylayout)
-        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .clear
 
         collectionView.register(QuoteCollectionViewCell.self)
@@ -98,6 +98,7 @@ class QuotesViewController: BaseViewController, UICollectionViewDelegate {
         self.view.addSubview(saved)
         self.view.addSubview(collectionView)
         setupConstraints()
+        setupViewTapHandling()
     }
 
     override func setupViewModel() {
@@ -271,6 +272,20 @@ extension QuotesViewController: UICollectionViewDataSource, UICollectionViewDele
         return CGSize(width: cellWidth, height: size.height + 48)
     }
 
+}
+
+//MARK: UIGesture & cell's touches
+extension QuotesViewController: UITextFieldDelegate, UITextViewDelegate {
+
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+
+    private func setupViewTapHandling() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
 }
 
 //MARK: Preview

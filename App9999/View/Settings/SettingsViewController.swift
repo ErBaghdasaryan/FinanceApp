@@ -52,6 +52,7 @@ class SettingsViewController: BaseViewController, UICollectionViewDelegate {
         self.view.addSubview(feedback)
         self.view.addSubview(rateApp)
         setupConstraints()
+        setupViewTapHandling()
     }
 
     override func setupViewModel() {
@@ -154,6 +155,20 @@ extension SettingsViewController {
 
 extension SettingsViewController: IViewModelableController {
     typealias ViewModel = ISettingsViewModel
+}
+
+//MARK: UIGesture & cell's touches
+extension SettingsViewController: UITextFieldDelegate, UITextViewDelegate {
+
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+
+    private func setupViewTapHandling() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
 }
 
 //MARK: Preview

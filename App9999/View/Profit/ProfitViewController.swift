@@ -39,6 +39,7 @@ class ProfitViewController: BaseViewController, UICollectionViewDelegate {
         self.view.addSubview(topView)
         self.view.addSubview(titleLabel)
         setupConstraints()
+        setupViewTapHandling()
     }
 
     override func setupViewModel() {
@@ -73,6 +74,20 @@ extension ProfitViewController {
 
 extension ProfitViewController: IViewModelableController {
     typealias ViewModel = IProfitViewModel
+}
+
+//MARK: UIGesture & cell's touches
+extension ProfitViewController: UITextFieldDelegate, UITextViewDelegate {
+
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+
+    private func setupViewTapHandling() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
 }
 
 //MARK: Preview
