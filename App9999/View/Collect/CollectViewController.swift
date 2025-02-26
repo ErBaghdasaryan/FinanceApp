@@ -185,6 +185,37 @@ extension CollectViewController {
     private func makeButtonsAction() {
         self.backButton.addTarget(self, action: #selector(backTapped), for: .touchUpInside)
         self.canceleButton.addTarget(self, action: #selector(resetSharesCount), for: .touchUpInside)
+        self.saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
+    }
+
+    @objc func saveTapped() {
+        guard let navigationController = self.navigationController else { return }
+
+        let sharesToSave = viewModel?.filteredShareItems.filter { $0.sharesCount > 0 } ?? []
+
+        let totalCost = sharesToSave.reduce(0) { $0 + ($1.balance * $1.sharesCount) }
+
+        let userBalance = self.homeView.getBalance()
+
+        if totalCost > userBalance {
+            showInsufficientFundsAlert()
+            return
+        }
+
+        let newBalance = userBalance - totalCost
+        self.viewModel?.balance = "\(newBalance)"
+
+        sharesToSave.forEach { viewModel?.addShare($0) }
+
+        navigationController.popViewController(animated: true)
+    }
+
+    func showInsufficientFundsAlert() {
+        let alert = UIAlertController(title: "Insufficient Funds",
+                                      message: "You don’t have enough balance to complete this purchase.",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 
     @objc func resetSharesCount() {
@@ -202,6 +233,7 @@ extension CollectViewController: IViewModelableController {
     typealias ViewModel = ICollectViewModel
 }
 
+//MARK: Collection view delegate
 extension CollectViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.viewModel?.filteredShareItems.count ?? 0
@@ -210,24 +242,24 @@ extension CollectViewController: UICollectionViewDataSource, UICollectionViewDel
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: ShareCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
 
-        if let model = self.viewModel?.filteredShareItems[indexPath.row] {
+        if var model = self.viewModel?.filteredShareItems[indexPath.row] {
             cell.setup(with: model)
+
+            cell.deleteSubject.sink { _ in
+                model.sharesCount = cell.minusSharesCount()
+            }.store(in: &cell.cancellables)
+
+            cell.sumSubject.sink { _ in
+                model.sharesCount =  cell.plusSharesCount()
+            }.store(in: &cell.cancellables)
         }
 
-        cell.deleteSubject.sink { _ in
-            cell.minusSharesCount()
-        }.store(in: &cell.cancellables)
-
-        cell.sumSubject.sink { _ in
-            cell.plusSharesCount()
-        }.store(in: &cell.cancellables)
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 58)
     }
-
 }
 
 //MARK: UISearchBarDelegate

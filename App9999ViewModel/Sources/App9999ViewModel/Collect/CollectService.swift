@@ -7,14 +7,20 @@
 
 import UIKit
 import App9999Model
+import SQLite
 
 public protocol ICollectService {
     func getShareItems() -> [SharePresentationModel]
+    func addShare(_ model: SharePresentationModel) throws -> SharePresentationModel
 }
 
 public class CollectService: ICollectService {
 
     public init() { }
+
+    private let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+
+    typealias Expression = SQLite.Expression
 
     public func getShareItems() -> [SharePresentationModel] {
         [
@@ -79,5 +85,40 @@ public class CollectService: ICollectService {
                                    procient: 6.6,
                                    sharesCount: 0),
         ]
+    }
+
+    public func addShare(_ model: SharePresentationModel) throws -> SharePresentationModel {
+        let db = try Connection("\(path)/db.sqlite3")
+        let shares = Table("Shares")
+        let idColumn = Expression<Int>("id")
+        let nameColumn = Expression<String>("name")
+        let imageNameColumn = Expression<String>("imageName")
+        let balanceColumn = Expression<Int>("balance")
+        let procientColumn = Expression<Double>("procient")
+        let sharesCountColumn = Expression<Int>("sharesCount")
+
+        try db.run(shares.create(ifNotExists: true) { t in
+            t.column(idColumn, primaryKey: .autoincrement)
+            t.column(nameColumn)
+            t.column(imageNameColumn)
+            t.column(balanceColumn)
+            t.column(procientColumn)
+            t.column(sharesCountColumn)
+        })
+
+        let rowId = try db.run(shares.insert(
+            nameColumn <- model.name,
+            imageNameColumn <- model.imageName,
+            balanceColumn <- model.balance,
+            procientColumn <- model.procient,
+            sharesCountColumn <- model.sharesCount
+        ))
+
+        return SharePresentationModel(id: Int(rowId),
+                                      imageName: model.imageName,
+                                      name: model.name,
+                                      balance: model.balance,
+                                      procient: model.procient,
+                                      sharesCount: model.sharesCount)
     }
 }

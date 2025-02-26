@@ -9,11 +9,12 @@ import Foundation
 import App9999Model
 
 public protocol ICollectViewModel {
-    var balance: String { get }
+    var balance: String { get set }
     func loadShares()
     var shareItems: [SharePresentationModel] { get set }
     func filterShares(with query: String)
     var filteredShareItems: [SharePresentationModel] { get set }
+    func addShare(_ model: SharePresentationModel)
 }
 
 public class CollectViewModel: ICollectViewModel {
@@ -27,6 +28,8 @@ public class CollectViewModel: ICollectViewModel {
     public var balance: String {
         get {
             return appStorageService.getData(key: .balanceCount) ?? ""
+        } set {
+            appStorageService.saveData(key: .balanceCount, value: newValue)
         }
     }
 
@@ -45,6 +48,14 @@ public class CollectViewModel: ICollectViewModel {
             filteredShareItems = shareItems
         } else {
             filteredShareItems = shareItems.filter { $0.name.lowercased().contains(query.lowercased()) }
+        }
+    }
+
+    public func addShare(_ model: SharePresentationModel) {
+        do {
+            _ = try self.collectService.addShare(model)
+        } catch {
+            print(error)
         }
     }
 }

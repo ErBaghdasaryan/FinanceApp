@@ -70,4 +70,12 @@ class HomeView: UIView {
     func changeBalance(balance: String) {
         self.balance.text = balance
     }
+
+    func getBalance() -> Int {
+        guard let numberString = balance.text?.filter({ $0.isNumber }),
+              let intValue = Int(numberString) else {
+            return 0
+        }
+        return intValue
+    }
 }
