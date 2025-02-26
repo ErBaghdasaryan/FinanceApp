@@ -9,11 +9,8 @@ import UIKit
 import App9999Model
 
 public protocol IBankService {
-    
 }
 
 public class BankService: IBankService {
     public init() { }
-
-
 }

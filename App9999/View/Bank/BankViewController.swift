@@ -33,6 +33,8 @@ class BankViewController: BaseViewController {
     private let totalReplenishment = ReplenishmentView(type: .total, isSecond: true)
     private var replenishmentStack: UIStackView!
 
+    private var randomValue: Int = 0
+
     override func viewDidLoad() {
         super.viewDidLoad()
         makeButtonsAction()
@@ -95,10 +97,19 @@ class BankViewController: BaseViewController {
         self.view.addSubview(replenishmentStack)
         setupConstraints()
         setupViewTapHandling()
+        setupTextFieldDelegates()
     }
 
     override func setupViewModel() {
         super.setupViewModel()
+
+        viewModel?.activateSuccessSubject.sink { [weak self] boolValue in
+            guard let self = self else { return }
+            if boolValue {
+                self.fourthReplenishment.setBalance(count: "\(self.randomValue)")
+                self.totalReplenishment.setBalance(count: "\(self.randomValue)")
+            }
+        }.store(in: &cancellables)
     }
 
     func setupConstraints() {
@@ -158,10 +169,37 @@ class BankViewController: BaseViewController {
 extension BankViewController {
     
     private func makeButtonsAction() {
-
+        randomize.addTarget(self, action: #selector(randomizeTapped), for: .touchUpInside)
     }
 
-    func generateLastFourDays() -> [String] {
+    @objc func randomizeTapped() {
+        guard let navigationController = navigationController else { return }
+        guard let subject = self.viewModel?.activateSuccessSubject else { return }
+        guard let minText = self.minimum.text, let minValue = Int(minText) else { return }
+        guard let maxText = self.maximum.text, let maxValue = Int(maxText) else { return }
+
+        guard minValue <= maxValue else {
+            self.showAlert()
+            return
+        }
+
+        let randomValue = Int.random(in: minValue...maxValue)
+        self.randomValue = randomValue
+
+        BankRouter.showPutViewController(in: navigationController,
+                                         navigationModel: .init(activateSuccessSubject: subject,
+                                                                count: randomValue))
+    }
+
+    private func showAlert() {
+        let alert = UIAlertController(title: "The minimum number is greater than the maximum",
+                                      message: "Please enter the numbers correctly so that we can perform the correct calculation..",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
+    private func generateLastFourDays() -> [String] {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
 
@@ -184,6 +222,26 @@ extension BankViewController: IViewModelableController {
 
 //MARK: UIGesture & cell's touches
 extension BankViewController: UITextFieldDelegate, UITextViewDelegate {
+
+    private func setupTextFieldDelegates() {
+        self.minimum.delegate = self
+        self.maximum.delegate = self
+
+        self.minimum.keyboardType = .numberPad
+        self.maximum.keyboardType = .numberPad
+    }
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        switch textField {
+        case self.minimum:
+            self.maximum.becomeFirstResponder()
+        case self.maximum:
+            self.maximum.resignFirstResponder()
+        default:
+            break
+        }
+        return true
+    }
 
     @objc private func hideKeyboard() {
         self.view.endEditing(true)

@@ -75,6 +75,14 @@ final class ViewControllerFactory {
         return viewController
     }
 
+    //MARK: Put in
+    static func makePutViewController(navigationModel: PutNavigationModel) -> PutViewController {
+        let assembler = Assembler(commonAssemblies + [PutAssembly()])
+        let viewController = PutViewController()
+        viewController.viewModel = assembler.resolver.resolve(IPutViewModel.self, argument: navigationModel)
+        return viewController
+    }
+
     //MARK: Settings
     static func makeSettingsViewController() -> SettingsViewController {
         let assembler = Assembler(commonAssemblies + [SettingsAssembly()])
