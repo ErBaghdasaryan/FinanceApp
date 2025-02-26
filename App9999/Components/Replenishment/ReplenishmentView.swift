@@ -4,7 +4,6 @@
 //
 //  Created by Er Baghdasaryan on 26.02.25.
 //
-
 import UIKit
 
 class ReplenishmentView: UIView {
